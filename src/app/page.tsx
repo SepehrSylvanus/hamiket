@@ -1,6 +1,7 @@
 import Image from "next/image";
 import styles from "./page.module.css";
 import CustomForm from "./components/form/CustomForm";
+import { Divider } from "@mui/material";
 
 export default function Home() {
   return (
@@ -8,8 +9,10 @@ export default function Home() {
       <div className={styles.formContainer}>
         <CustomForm />
       </div>
-
-      <div className={styles.tableContainer}></div>
+      <Divider />
+      <div className={styles.tableContainer}>
+        
+      </div>
     </div>
   );
 }

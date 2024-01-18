@@ -3,19 +3,26 @@
 import { writeFile } from "fs/promises";
 import { join } from "path";
 
+import prisma from "@/lib/database/connect";
+import { Users } from "../../../types";
+
+type UserCreateInput = {
+  profilePic: string;
+  name: string;
+  gender: string;
+  birthDate: string;
+  age: number;
+};
 export const formUpload = async (data: FormData) => {
-  const formDate: { [key: string]: string | File } = {
-    profilePic: data.get("profilePic") as File,
+  const formDate: UserCreateInput = {
+    profilePic: (data.get("profilePic") as File).name,
     name: data.get("name") as string,
     gender: data.get("gender") as string,
     birthDate: data.get("birthDate") as string,
-    age: data.get("age") as string,
+    age: Number(data.get("age") as string),
   };
-  
   console.log(formDate);
- if(formDate.profilePic instanceof File){
-  console.log(formDate.profilePic.name)
- }
+
   const file: File | null = data.get("profilePic") as unknown as File;
   if (!file) {
     throw new Error("No file uploaded");
@@ -29,4 +36,12 @@ export const formUpload = async (data: FormData) => {
   const path = join(process.cwd(), "public", file.name);
   await writeFile(path, buffer);
   console.log(`open ${path} to see the uploaded file`);
+
+  if (Object.values(formDate).some((value) => value === null)) {
+    throw new Error("Form data cannot contain null values");
+  }
+
+  await prisma.user.create({
+    data: formDate,
+  });
 };

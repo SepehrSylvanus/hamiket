@@ -15,12 +15,51 @@ import {
 } from "@mui/material";
 import { DatePicker } from "@mui/x-date-pickers";
 import { formUpload } from "@/app/actions/formActions";
-import CloudUploadIcon from '@mui/icons-material/CloudUpload';
+import CloudUploadIcon from "@mui/icons-material/CloudUpload";
 import { VisuallyHiddenInput } from "../customStyles/customStyles";
+import React, { useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { addUser } from "@/lib/redux/usersSlice";
+import { Users } from "../../../../types";
+
 const CustomForm = () => {
+  const dispatch = useDispatch();
+const users = useSelector((state: Users) => state.users)
+  useEffect(()=>{
+console.log(users)
+  }, [users])
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    const formElement = e.target as HTMLFormElement;
+    const data = new FormData(formElement);
+
+    const formDate: Users = {
+      profilePic: (data.get("profilePic") as File).name,
+      name: data.get("name") as string,
+      gender: data.get("gender") as string,
+      birthDate: data.get("birthDate") as string,
+      age: data.get("age") as string,
+    };
+
+    dispatch(addUser(formDate));
+  };
+
   return (
     <div className={styles.container}>
-      <form action={formUpload} className={styles.mainForm}>
+      <form
+        action={formUpload}
+/**
+ * you can use redux with unhiding the onSubmit below
+ * but after server action (new next 14 feature for handeling send
+ * data to backend) won't work and we have to write another logic for sending data
+ * to backend
+ * So I decide to use server actions and read table data from back 
+ * instead of using redux
+ */
+        
+        // onSubmit={handleSubmit}
+        className={styles.mainForm}
+      >
         <FormControl>
           <Button
             component="label"
